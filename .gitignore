@@ -1,2 +1,5 @@
 # Emacs backup files
 *~
+
+# Notebook checkpoints
+notebooks/.ipynb_checkpoints/*
