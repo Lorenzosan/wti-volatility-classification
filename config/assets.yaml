@@ -1,0 +1,13 @@
+# Configuration file
+
+data:
+  asset: "CL=F"
+  start_date: "2005-01-01"
+  end_date: "2026-01-01"
+
+features:
+  short_volatility_window: 5
+  long_volatility_window: 20
+  forecast_horizon: 5
+  lags: [1, 2, 5, 10]
+

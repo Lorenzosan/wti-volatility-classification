@@ -3,3 +3,6 @@
 
 # Notebook checkpoints
 notebooks/.ipynb_checkpoints/*
+
+# Pycache files
+src/__pycache__/*
