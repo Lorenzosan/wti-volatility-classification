@@ -26,8 +26,17 @@ class FeaturesConfig:
         if self.forecast_horizon is None:
             self.forecast_horizon = 5
 
+@dataclass
+class TrainConfig:
+    test_size: float = 0.2
+    ridge_alpha: float = 0.5
+    rf_n_estimators: int = 200
+    rf_max_depth: int = 5
+    random_state: int = 0
+    baseline_column: str = "std_20"
             
 @dataclass
 class ProjectConfig:
     data: DataConfig
     features: FeaturesConfig
+    train: TrainConfig

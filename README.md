@@ -1,4 +1,4 @@
-# Volatility modeling in financial and commodity markets
+# Volatility modeling in financial markets
 
 ## Overview
 This project studies short-term volatility dynamics in financial time series using statistical features and ML models.
@@ -26,7 +26,7 @@ The pipeline is asset-agnostic, and can be applied to equities, commodities or o
   - Volatility (5 days and 20 days)
 
 ### Target
-- Future volatility --  Rolling standard deviation over the next 5 days
+- Future volatility: rolling standard deviation over the next 5 days (shifted to avoid look-ahead bias)
 
 ### Models
 - Baseline: volatility persistence
@@ -40,10 +40,13 @@ The pipeline is asset-agnostic, and can be applied to equities, commodities or o
   - Mean squared error (MSE)
 
 ### Key results
+Results are evaluated on a held-out test set using a chronological split.
+
 - The baseline model (volatility persistence) already provides strong predictive performance
 - Ridge and Random Forest models achieve modest but consistent improvements
 - Random Forest slightly outperforms linear models, indicating weak nonlinear effects
-- Volatility is primarily driven by its own past (volatility clusterin) -- Long-term volatility (20-day window) is the most important feature
+- Volatility is primarily driven by its own past (volatility clustering)
+- Long-term volatility (20-day window) is the most important feature
 - Short-term volatility and recent trends contribute additional signal
 - Lagged returns have negligible predictive power
 - All the models underestimate the extreme volatility spikes
@@ -65,4 +68,4 @@ python main.py
 
 ### Analyze results
 
-Use `notebooks/02_visualization.ipynb`
+Open `notebooks/02_visualization.ipynb` to visualize predictions and feature importance.
