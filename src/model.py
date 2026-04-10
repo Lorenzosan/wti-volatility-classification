@@ -125,3 +125,74 @@ def train_and_evaluate(X: pd.DataFrame, y: pd.Series, config: ProjectConfig) -> 
         "models": fitted_models,
         "split_index": X_train.index[-1],
     }
+
+def walk_forward_evaluation(
+    X: pd.DataFrame,
+    y: pd.Series,
+    config: ProjectConfig,
+    train_fraction: float = 0.6,
+    step_size: int = 20,
+    test_window: int = 20,
+) -> Dict[str, Any]:
+    X, y = clean_data(X, y)
+
+    n_samples = len(X)
+    initial_train_size = int(n_samples * train_fraction)
+
+    if initial_train_size <= 0 or initial_train_size >= n_samples:
+        raise ValueError("Invalid initial train size")
+
+    if step_size <= 0 or test_window <= 0:
+        raise ValueError("step_size and test_window must be positive")
+
+    baseline_column = config.train.baseline_column
+    if baseline_column not in X.columns:
+        raise KeyError(f"Baseline column '{baseline_column}' not found in X")
+
+    models = build_models(config.train)
+
+    all_predictions = []
+    all_actuals = []
+
+    for start_test in range(initial_train_size, n_samples - test_window + 1, step_size):
+        end_test = start_test + test_window
+
+        X_train = X.iloc[:start_test].copy()
+        y_train = y.iloc[:start_test].copy()
+
+        X_test = X.iloc[start_test:end_test].copy()
+        y_test = y.iloc[start_test:end_test].copy()
+
+        fold_df = pd.DataFrame(index=y_test.index)
+        fold_df["actual"] = y_test
+        fold_df["baseline_pred"] = X_test[baseline_column]
+
+        for name, model in models.items():
+            fitted_model = clone(model)
+            fitted_model.fit(X_train, y_train)
+
+            preds = fitted_model.predict(X_test)
+            fold_df[f"{name}_pred"] = preds
+
+        all_predictions.append(fold_df)
+        all_actuals.append(y_test)
+
+    if not all_predictions:
+        raise ValueError("No walk-forward folds were created")
+
+    results = pd.concat(all_predictions).sort_index()
+
+    metrics = {
+        "baseline": compute_metrics(results["actual"], results["baseline_pred"]),
+        "ridge": compute_metrics(results["actual"], results["ridge_pred"]),
+        "rf": compute_metrics(results["actual"], results["rf_pred"]),
+    }
+
+    return {
+        "results": results,
+        "metrics": metrics,
+        "n_folds": len(all_predictions),
+        "initial_train_size": initial_train_size,
+        "step_size": step_size,
+        "test_window": test_window,
+    }

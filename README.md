@@ -34,13 +34,14 @@ The pipeline is asset-agnostic, and can be applied to equities, commodities or o
 - Random forest: nonlinear model
 
 ### Evaluation
-- Time-based train/test split (no shuffling)
+- Chronological train/test split (no shuffling)
+- Walk-forward evaluation with expanding training window
 - Metrics
   - Mean absolute error (MAE)
   - Mean squared error (MSE)
 
 ### Key results
-Results are evaluated on a held-out test set using a chronological split.
+Results are evaluated on a held-out test set and validated using walk-forward evaluation.
 
 - The baseline model (volatility persistence) already provides strong predictive performance
 - Ridge and Random Forest models achieve modest but consistent improvements
@@ -49,8 +50,8 @@ Results are evaluated on a held-out test set using a chronological split.
 - Long-term volatility (20-day window) is the most important feature
 - Short-term volatility and recent trends contribute additional signal
 - Lagged returns have negligible predictive power
-- All the models underestimate the extreme volatility spikes
-
+- All the models tend to underestimate the extreme volatility spikes
+- Walk-forward evaluation shows higher errors than a single split but confirms that model improvements are stable across time
 
 ## How to run
 
@@ -62,9 +63,7 @@ pip install -r requirements.txt
 
 ### Run pipeline
 
-```bash
-python main.py
-```
+Running `python main.py` saves predictions, metrics, and trained models in the `results/` folder.
 
 ### Analyze results
 
